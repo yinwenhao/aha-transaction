@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 这里的namespace名字必须为执行该sql的mapper地址&nbsp; -->
+<mapper namespace="com.aha.example.mapper.OrderRecordsModifyMapper">
+
+	<resultMap id="OrderRecordsModify" type="com.aha.example.mapper.OrderRecordsModify">
+		<id column="guid" property="guid" />
+		<result column="status" property="status" />
+		<result column="modify_time" property="modifyTime" />
+		<result column="failed_times" property="failedTimes" />
+	</resultMap>
+
+	<select id="getCompensateTaskParams" resultMap="OrderRecordsModify">
+		<![CDATA[
+			SELECT * FROM order_records_modify WHERE status > #{statusMin} and status < #{statusMax} and failed_times < #{failedTimes} and modify_time < #{modifyTime}
+        ]]>
+	</select>
+
+	<select id="getFalseCompensateTaskParams" resultMap="OrderRecordsModify">
+		<![CDATA[
+			SELECT * FROM order_records_modify WHERE status > #{statusMin} and status < #{statusMax} and failed_times >= #{failedTimes}
+        ]]>
+	</select>
+
+	<insert id="insertCompensateTaskParam" parameterType="com.aha.example.mapper.OrderRecordsModify">
+		<![CDATA[
+		insert into order_records_modify
+		(guid,status,modify_time,failed_times,marks)
+		values(#{guid},#{status}, #{modifyTime},0,0)
+        ]]>
+	</insert>
+
+	<update id="updateStatusFromOldStatusAndResetFailedTimes">
+		update
+		order_records_modify set status = #{newStatus},
+		modify_time=#{modifyTime}, failed_times=0
+		where guid =
+		#{guid} and
+		status=#{oldStatus}
+	</update>
+
+	<update id="updateStatusFromOldStatusAndResetFailedTimesForSkipFalse">
+		update
+		order_records_modify set status =
+		#{newStatus},marks=#{newMarks},
+		modify_time=#{modifyTime},
+		failed_times=0
+		where guid =
+		#{guid} and
+		status=#{oldStatus} and
+		marks=#{oldMarks}
+	</update>
+
+	<update id="updateStatus">
+		update
+		order_records_modify set status = #{newStatus},
+		modify_time=#{modifyTime}
+		where guid =
+		#{guid}
+	</update>
+
+	<update id="addFailedTimes">
+		update
+		order_records_modify set failed_times =
+		failed_times+#{addFailedNum},
+		modify_time=#{modifyTime}
+		where guid=
+		#{guid}
+	</update>
+
+</mapper>

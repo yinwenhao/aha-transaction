@@ -130,4 +130,12 @@ public class CompensatorManagerImpl<T extends CompensateTaskParam, R> extends Ab
 		this.skipFalseTasks = skipFalseTasks;
 	}
 
+	@Override
+	public void doAllTransaction(T param) throws Exception {
+		insertCompensateTaskParam(param);
+		for (TransactionComponentAndCompensator<T, R> tcc : getCompensators()) {
+			tcc.doWork(param);
+		}
+	}
+
 }

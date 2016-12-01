@@ -42,4 +42,12 @@ public interface CompensatorManager<T, R> {
 	 */
 	public int insertCompensateTaskParam(T param);
 
+	/**
+	 * 进行分布式事务
+	 * 
+	 * @param param
+	 * @return
+	 */
+	public void doAllTransaction(T param) throws Exception;
+
 }
